@@ -1,0 +1,67 @@
+-- `tmv_area_nmea`
+
+-- MySQL dump 10.15  Distrib 10.0.38-MariaDB, for debian-linux-gnu (x86_64)
+--
+-- ------------------------------------------------------
+-- Server version	10.0.38-MariaDB-0+deb8u1
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `tmv_area_nmea`
+--
+
+DROP TABLE IF EXISTS `tmv_area_nmea`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tmv_area_nmea` (
+  `area_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `area_name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `area_range` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `area_lat1` decimal(9,6) NOT NULL,
+  `area_lon1` decimal(9,6) NOT NULL,
+  `area_lat2` decimal(9,6) NOT NULL,
+  `area_lon2` decimal(9,6) NOT NULL,
+  `area_lat3` decimal(9,6) NOT NULL,
+  `area_lon3` decimal(9,6) NOT NULL,
+  `area_lat4` decimal(9,6) NOT NULL,
+  `area_lon4` decimal(9,6) NOT NULL,
+  `area_lat5` decimal(9,6) NOT NULL,
+  `area_lon5` decimal(9,6) NOT NULL,
+  `area_lat6` decimal(9,6) NOT NULL,
+  `area_lon6` decimal(9,6) NOT NULL,
+  `last_update_area` date NOT NULL,
+  PRIMARY KEY (`area_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tmv_area_nmea`
+--
+
+LOCK TABLES `tmv_area_nmea` WRITE;
+/*!40000 ALTER TABLE `tmv_area_nmea` DISABLE KEYS */;
+INSERT INTO `tmv_area_nmea` VALUES (1,'Nord-Ostsee-Kanal','Kiel Holtenau Gr. Schleuse (N)',54.366723,10.139185,54.366342,10.141977,54.365883,10.144965,54.365433,10.144793,54.365854,10.141941,54.366254,10.139084,'2016-11-02'),(2,'Nord-Ostsee-Kanal','Kiel Holtenau Gr. Schleuse (S)',54.366168,10.139061,54.365780,10.141654,54.365336,10.144755,54.364867,10.144594,54.365317,10.141568,54.365705,10.138875,'2016-11-02'),(3,'Nord-Ostsee-Kanal','Brunsbuettel Große Schleuse (N)',53.895139,9.146280,53.894333,9.144779,53.893178,9.142574,53.892856,9.143037,53.893893,9.144975,53.894848,9.146795,'2016-11-02'),(4,'Nord-Ostsee-Kanal','Brunsbuettel Große Schleuse (S)',53.894740,9.146902,53.893826,9.145170,53.892767,9.143208,53.892466,9.143693,53.893459,9.145561,53.894407,9.147359,'2016-11-02'),(5,'Nord-Ostsee-Kanal','NOK',53.895879,9.145847,54.405048,9.418841,54.368846,10.140407,54.365605,10.139231,54.146575,9.715830,53.891818,9.150341,'2016-11-02'),(6,'Elbe','Hamburger Hafengebiet',53.556030,9.778629,53.565120,9.804535,53.541798,10.122986,53.428344,9.991039,53.499366,9.869484,53.536683,9.767545,'2016-11-02'),(7,'Elbe','Elbmuendung',53.891887,8.683877,53.829406,8.825575,53.836794,9.005055,53.898478,8.994211,53.893822,8.859226,53.932539,8.756864,'2016-11-02'),(8,'Elbe','Unterelbe',53.565120,9.804535,53.536683,9.767545,53.642049,9.137029,53.836794,9.005055,53.898478,8.994211,53.894479,9.654549,'2016-11-09');
+/*!40000 ALTER TABLE `tmv_area_nmea` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed
+
