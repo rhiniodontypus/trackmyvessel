@@ -3,9 +3,9 @@
 ## 1. Introduction
 trackmyvessel (TMV) is a tool to receive and decode a live feed of AIS AIVDM signals from ships.
 
-It allows to define a personal list of ships and to track them. It also allows to define certain regions, so that when the ship reaches or leaves the region, an information mail is sent.
+It allows to define a personal list of ships and to track them. It also allows to define certain regions, so that when the ship reaches or leaves the region, an information e-mail is sent.
 
-The program evaluates each incoming AIVDM data packet individually, compares it with the information from the database and initiates the sending of an e-mail if necessary.
+The program accepts an AIVDM data stream on UDP port 10110 and evaluates each incoming packet individually, compares it with the information from the database and initiates an e-mail dispatch if applicable.
 
 Please be aware that this software is not intended for safety-critical applications, but for hobby use only. I disclaim all responsibility for any damage caused by the use of this software. 
 
@@ -134,3 +134,4 @@ ruby nmea_main.rb
 
 
 This software is licensed with [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
