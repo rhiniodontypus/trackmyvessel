@@ -1,13 +1,13 @@
-# trackmyvessel
+# trackmyvessel (TMV)
 
 ## 1. Introduction
-trackmyvessel (tmv) is a tool to receive and decode a live feed of AIS signals from ships.
+trackmyvessel (TMV) is a tool to receive and decode a live feed of AIS AIVDM signals from ships.
 
 It allows to define a personal list of ships and to track them. It also allows to define certain regions, so that when the ship reaches or leaves the region, an information mail is sent.
 
-The program evaluates each incoming AIVDM packet individually, compares it with the information from the database and initiates the sending of an e-mail if necessary.
+The program evaluates each incoming AIVDM data packet individually, compares it with the information from the database and initiates the sending of an e-mail if necessary.
 
-Please be aware that this software is not intended for safety-critical applications, but for hobby use only. I disclaim all responsibility for any damage caused by the use of the software. 
+Please be aware that this software is not intended for safety-critical applications, but for hobby use only. I disclaim all responsibility for any damage caused by the use of this software. 
 
 ## 2. Setting up the virtual environment for Ruby with Rbenv
 
@@ -46,6 +46,12 @@ gem install bundler
 ```
 
 7. Specify the local gem installation directory: In the root of your project directory, create a file named .bundle/config (create the .bundle directory if it doesn't exist) and add the following content:
+
+```sh
+mkdir .bundle/
+nano .bundle/config
+```
+
 ```
 --- 
 BUNDLE_PATH: "vendor/bundle"
@@ -112,6 +118,8 @@ Add your mail client credential to [nmea_mailer.rb](./config/nmea_mailer.rb).
 
 ## 6. Running the code
 
+In the main repo folder start the program with
+
 ```sh
 ruby nmea_main.rb
 ```
@@ -125,4 +133,4 @@ ruby nmea_main.rb
 
 
 
-This software is licensed with [CC BY-NC 4.0](https://github.com/idleberg/Creative-Commons-Markdown/blob/main/4.0/by-nc.markdown)
+This software is licensed with [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
