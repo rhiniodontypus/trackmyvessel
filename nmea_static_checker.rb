@@ -24,8 +24,7 @@ class StaticDataChecker
     
     if static_db_data.nil? == true
       database_static_store = true
-    end
-
+    else
       static_db_data_array = [ 
         static_db_data[:mmsi_static_nmea],
         static_db_data[:callsign_static_nmea], 
@@ -57,6 +56,7 @@ class StaticDataChecker
         static_db_data[:epfd_static_nmea].between?(1, 8) == false
         database_static_store = true
       end
+    end
     return database_static_store
   end
   
