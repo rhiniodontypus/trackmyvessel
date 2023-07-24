@@ -120,7 +120,7 @@ sh ./scripts/tmv_myvessels_insert_new_vessel.sh
 
 and enter the vessel's details. So far you can only enter one vessel at a time.
 
-## 5. Setting up your UDP port, DB and Mail client connection
+## 5. Setting up your binding IP address, UDP port and DB and mail client credentials
 
 Add your database credentials to [nmea_main.rb](nmea_main.rb):
 - IP address at line 50: "@socket.bind('\<IPv4\>', @port)"
