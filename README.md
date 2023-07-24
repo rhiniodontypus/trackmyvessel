@@ -62,6 +62,16 @@ BUNDLE_PATH: "vendor/bundle"
 bundle install
 ```
 
+If this fails make sure you have installed the developmental libraries:
+
+```sh
+sudo apt-get install ruby-dev
+```
+
+```sh
+sudo apt install libmariadb-dev-compat libmariadb-dev
+```
+
 9. Activate the gem environment:
 ```sh
 rbenv rehash
@@ -110,7 +120,11 @@ sh ./scripts/tmv_myvessels_insert_new_vessel.sh
 
 and enter the vessel's details. So far you can only enter one vessel at a time.
 
-## 5. Setting up your DB and Mail client connection
+## 5. Setting up your UDP port, DB and Mail client connection
+
+Add your database credentials to [nmea_main.rb](nmea_main.rb):
+- IP address at line 50: "@socket.bind('\<IPv4\>', @port)"
+- if necessary: UDP port at line 490: "client = Main.new(\<UDP port\>)"
 
 Add your database credentials to [DB_CONNECT.rb](./config/DB_CONNECT.rb).
 
