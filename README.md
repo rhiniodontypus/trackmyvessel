@@ -87,6 +87,18 @@ I use the MariaDB database.
 brew install mariadb
 ```
 
+and activate it (after each reboot)
+
+```sh
+mysql.server start
+```
+
+or for auto-start MariaDB service
+
+```sh
+brew services start mariadb
+```
+
 1b. Debian/Ubuntu
 ```sh
 sudo apt install mariadb-server
