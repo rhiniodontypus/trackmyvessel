@@ -4,7 +4,7 @@
 require 'socket'
 require 'nmea_plus'
 require 'mail'
-#require 'stringio'	# MAY BE NECESSARY IF THE UDP STREAM CANNOT BE READ
+#require 'stringio' # MAY BE NECESSARY IF THE UDP STREAM CANNOT BE READ
 
 # MESSAGE TYPE 1/2/3 METHODS
 require_relative 'nmea_get_type123_messages.rb'
@@ -23,7 +23,7 @@ require_relative 'nmea_type8_checker'
 # require_relative 'nmea_get_type24_messages.rb'
 # #require_relative 'nmea_get_type27_messages.rb'
 
-# MY VESSLES METHODS
+# MY TRACKED VESSEL METHODS
 require_relative 'nmea_all_terminals_tracking_checker'
 require_relative 'nmea_all_terminals_tracking_checker2.rb'
 require_relative 'nmea_myvessel_checker'
@@ -31,8 +31,7 @@ require_relative 'nmea_myvessel_checker'
 # MAILER METHODS
 require_relative 'nmea_mailer_checker.rb'
 require_relative 'nmea_mail_template.rb'
-#require_relative './config/nmea_mailer.rb'
-require_relative './temp/nmea_mailer_jessi.rb'
+require_relative './config/nmea_mailer.rb'
 
 # DATABASE METHODS
 require_relative 'nmea_database_store.rb'
@@ -50,7 +49,7 @@ class Main
     @socket.bind('<IPv4>', @port)
     ## IPv6 SOCKET
     # @socket = UDPSocket.new(Socket::AF_INET6)
-    # @socket.bind('<IPv6>', @port)
+    # @socket.bind('<IPv6', @port)
 
     while line = @socket.gets
 
@@ -72,9 +71,11 @@ class Main
                    message.all_messages_received? == true
                 
                 if "AIVDM" == message.data_type
-                  message_type = GetType123Messages.new
-                  type, rep_ind, mmsi, flag = message_type.aivdm_message_type(message)
-                  type = message.ais.message_type
+                  message_type_123 = GetType123Messages.new
+                  type, rep_ind, mmsi, flag = message_type_123.aivdm_message_type(message)
+                  
+                  ## CHECKING IF MMSI NUMBER IS PLAUSIBLE (i.e. >= 9 DIGITS)
+                  next if mmsi.to_s.length < 9
 
                   ## SKIPPING AIS BINARY MESSAGES TYPE 6, 8, 9, 12, 14, 15, 21, 27
                   ## ONLY MESSAGE TYPES 1/2/3 AND 5 ARE RELEVANT
@@ -87,30 +88,21 @@ class Main
                           type == 19 or
                           type == 21 or
                           type == 27                     
-                                
-                  mmsi = message.ais.source_mmsi
-                  
-                  ## CHECKING IF MMSI NUMBER IS PLAUSIBLE (>= 9 DIGITS)
-                  next if mmsi.to_s.length < 9
                   
                   if type == 1 or type == 2 or type == 3
                  
                     puts
                     puts "CHECKING TYPE 1/2/3 MESSAGE"
-                    puts line
                   
                     ## CHECKING IF AIVDM MESSAGE 1/2/3 IS PLAUSIBLE (= 47 DIGITS)
-                    ## DIFFERENT LENGTH 49 NECESSARY FOR UNKNOWN REASON AS AIVDM-
-                    ## MESSAGE IS STILL 47
-                    next if message.to_s.length != 49
-
-                    message_position = GetType123Messages.new
+                    ## YOU MIGHT HAVE TO REMOVE A NEW LINE CHARACTER
+                    next if line.chomp.length != 47
 
                     puts "MMSI #{mmsi}: Extracting position report data."
 
                     status, turn, sog, lon, lat, cog,
                     true_headingh_v, timestamp, maneuvre =
-                    message_position.aivdm_type123_position(message)
+                    message_type_123.aivdm_type123_position(message)
 
                     ## SKIPPING FALSE POSITIONAL INFORMATION
                     next if lat > 90 or lon > 180
@@ -138,8 +130,8 @@ class Main
                     puts "MMSI #{mmsi}: Storing current position."
 
                     ## STORE CURRENT SHIP POSITION IN DATABASE (OVERWRITES LAST ENTRY OF SHIP POSITION)
-                    database = DatabaseStore.new(mmsi)
-                    database.insert_nmea_type123_data(ais_type1_2_3_hash)
+                    databasestore = DatabaseStore.new(mmsi)
+                    databasestore.insert_nmea_type123_data(ais_type1_2_3_hash)
 
                     puts "MMSI #{mmsi}: Checking presence at terminal."
 
@@ -165,8 +157,8 @@ class Main
                       terminal_tracking_checker.db_all_terminal_tracking_data(mmsi, terminal_id_v)
 
                       if terminaltracking_store == true
-                        database = DatabaseStore.new(mmsi)
-                        database.insert_all_terminals_tracking_data(
+                        databasestore = DatabaseStore.new(mmsi)
+                        databasestore.insert_all_terminals_tracking_data(
                           ais_type1_2_3_hash,
                           terminal_id_v,
                           db_current_all_terminal_tracking_array
@@ -177,20 +169,20 @@ class Main
                     puts "MMSI #{mmsi}: Checking if tracked vessel is at terminal."
 
                     ## CHECKING IF CURRENT MMSI BELONGS TO A TRACKED VESSEL
-                    mmsilist = MyVesselChecker.new
-                    mmsi_list_myvessels = mmsilist.myvessels_mmsi_db_read
+                    myvesselchecker = MyVesselChecker.new
+                    #mmsi_list_myvessels = mmsilist.myvessels_mmsi_db_read
+                    mmsi_list_myvessels = myvesselchecker.myvessels_mmsi_db_read
 
                     ## CHECKING EXISTENCE OF OLD ENTRIES FOR 
                     ## STATIC/VOYAGE/TRACKING AND AREA/TERMINAL/LAST POSITION
                     if mmsi_list_myvessels.include?(mmsi) == true
-                      check_tmv = MyVesselChecker.new
                       
                       ## CHECKING EXISTENCE OF STATIC AND VOYAGE DATA
                       myvessels_tracking_static,
                       myvessels_tracking_voyage,
                       static_voyage_data_exist,
                       age_voyage_data = 
-                      check_tmv.myvessels_static_voyage_data_exists(ais_type1_2_3_hash)
+                      myvesselchecker.myvessels_static_voyage_data_exists(ais_type1_2_3_hash)
 
                       ## CHECKING EXISTENCE OF LAST TRACKING DATA
                       myvessels_tracking_last_entry,
@@ -199,12 +191,12 @@ class Main
                       tracking_last_entry_exist,
                       age_last_tracking_data,
                       age_2nd_last_tracking_data =
-                      check_tmv.myvessels_tracking_data_exists(ais_type1_2_3_hash)
+                      myvesselchecker.myvessels_tracking_data_exists(ais_type1_2_3_hash)
 
                       ## READING CURRENT TRACKING DATA
                       myvessels_tracking, myvessels_tracking_current_array,
                       database_tmv_store, vessel_movement = 
-                      check_tmv.myvessels_tracking_current_data(
+                      myvesselchecker.myvessels_tracking_current_data(
                         ais_type1_2_3_hash,
                         myvessels_tracking_static,
                         myvessels_tracking_voyage,
@@ -218,10 +210,8 @@ class Main
                       )
 
                       if database_tmv_store == true
-
-                        database = DatabaseStore.new(mmsi)
                         
-                        database.insert_tmv_data(
+                        databasestore.insert_tmv_data(
                           ais_type1_2_3_hash,
                           myvessels_tracking,
                           myvessels_tracking_static,
@@ -273,6 +263,7 @@ class Main
                         puts "MMSI #{mmsi}: New vessel information. Mailer is called."
 
                         mailtemplate = MailTemplate.new
+
                         time_meldung, mmsi_mailtemplate = mailtemplate.ts_conversion_utc_local(ais_type1_2_3_hash)
                         age_voyage_data = mailtemplate.age_last_update(myvessels_tracking_voyage)
                         body_v_header = mailtemplate.body_header(
@@ -287,12 +278,11 @@ class Main
                           age_voyage_data,
                           body_status
                         )
-                        puts body_v_status
 
                         body_v_ship_position = mailtemplate.body_ship_position(ais_type1_2_3_hash)
                         body_v = "#{body_v_header}#{body_v_status}#{body_v_ship_position}"
                     
-                        ## CALL MAILER
+                        ## CALLING MAILER
                         mailer = Mailer.new
                         mailer.maildefaults
                         mailer.maildelivery(body_v)
@@ -333,8 +323,8 @@ class Main
                   #     db_type8_check = Type8DataChecker.new(ais_type8_d200_f10_hash)
                   #     database_type8_store = db_type8_check.db_type8_data_read(mmsi)
                   #     if database_type8_store == true
-                  #       database = DatabaseStore.new(mmsi)
-                  #       database.insert_nmea_type8_data(ais_type8_d200_f10_hash)
+                  #       databasestore = DatabaseStore.new(mmsi)
+                  #       databasestore.insert_nmea_type8_data(ais_type8_d200_f10_hash)
                   #     end  
                   #   end
                   end
@@ -405,8 +395,8 @@ class Main
                     db_voyage_check = VoyageDataChecker.new(ais_type5_hash)
                     database_voyage_store = db_voyage_check.db_voyage_data_read(mmsi)
                     if database_voyage_store == true
-                      database = DatabaseStore.new(mmsi)
-                      database.insert_nmea_type5_voyage_data(ais_type5_hash)
+                      databasestore = DatabaseStore.new(mmsi)
+                      databasestore.insert_nmea_type5_voyage_data(ais_type5_hash)
                     end
                                       
                     ## DATABASE CHECKER / STORER - CHECKING IF SHIP IS ALREADY IN STATIC DB
@@ -418,14 +408,14 @@ class Main
                     if epfd_v.between?(1, 8) == true
                       database_static_store = db_static_check.db_static_data_epfd18_read(mmsi, epfd_v)
                       if database_static_store == true  
-                        database = DatabaseStore.new(mmsi)
-                        database.insert_nmea_type5_static_data(ais_type5_hash)
+                        databasestore = DatabaseStore.new(mmsi)
+                        databasestore.insert_nmea_type5_static_data(ais_type5_hash)
                       end
                     elsif epfd_v == 0 or epfd_v >= 9
                       database_static_store = db_static_check.db_static_data_epfd015_read(mmsi, epfd_v)
                       if database_static_store == true
-                        database = DatabaseStore.new(mmsi)
-                        database.insert_nmea_type5_static_data(ais_type5_hash)
+                        databasestore = DatabaseStore.new(mmsi)
+                        databasestore.insert_nmea_type5_static_data(ais_type5_hash)
                       end
                     end
 
@@ -440,10 +430,12 @@ class Main
 
                       database_myvessels_store, myvessels_list_db, flag_hash = 
                       myvessel_exists.myvessels_list_db_read(ais_type5_hash)
+
+                      puts "MMSI #{mmsi}: Checking for mailer condition."
                       
                       if database_myvessels_store == true
-                        database2 = DatabaseStore.new(mmsi)
-                        database2.insert_tmv_ship_static_data(ais_type5_hash, flag_hash)
+                        databasestore = DatabaseStore.new(mmsi)
+                        databasestore.insert_tmv_ship_static_data(ais_type5_hash, flag_hash)
                         
                         ## MAIL NOTIFICATION WHEN A TRACKED VESSEL GETS UPDATED
                         template_tmv_update = MailTemplate.new
